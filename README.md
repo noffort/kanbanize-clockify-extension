@@ -1,1 +1,1 @@
-# kanbanize-clockify-extension
+# Clockify x Kanbanize - Extension

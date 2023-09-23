@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Noffort - Integrate Clockify and Kanbanize.",
+  "description": "A extension to integration Clockify and Kanbanize.",
+  "version": "1.0.0",
+  "icons": {
+    "16": "images/noffort_16.png",
+    "48": "images/noffort_48.png",
+    "128": "images/noffort_128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/kanbanize.com.com/*"],
+      "js": ["scripts/clockify.js"],
+      "css": ["css/style.css"]
+    }
+  ],    
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "view/popup.html"
+  },
+  "host_permissions": [
+      "https://api.clockify.me/api/v1/*"
+  ]
+}
