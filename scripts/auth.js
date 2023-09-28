@@ -40,9 +40,12 @@ async function auth() {
       throw error;
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('apiKeyForm').addEventListener("submit", function(evt) {
+    evt.preventDefault();
+  }, true);
 
-window.addEventListener('load', function () {
   document.getElementById("submit-button").addEventListener("click", auth);
-});
+}, false);
 
 
