@@ -13,21 +13,27 @@
                 <img src="/images/noffort_128.png" alt="Noffort Logo">
             </h1>
         </div>
-        <div class="select-container">
-            <select id="project">
-                <option value="default">Project*</option>
-                <option value="project2">Project 2</option>
-                <option value="project3">Project 3</option>
-            </select>
+        <div id="form-container" class="disabled">
+            <input type="text" disabled placeholder="TASK" id="task">
+            <div class="select-container">
+                <select id="project">
+                    <option value="" disabled selected>Select a Project</option>
+                    <option value="project2">Project 2</option>
+                    <option value="project3">Project 3</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <select id="tag">
+                    <option value="" disabled selected>Select a Tag</option>
+                    <option value="tag2">Tag 2</option>
+                    <option value="tag3">Tag 3</option>
+                </select>
+            </div>
+            <button type="button">Submit</button>
         </div>
-        <div class="select-container">
-            <select id="tag">
-                <option value="default">Tag</option>
-                <option value="tag2">Tag 2</option>
-                <option value="tag3">Tag 3</option>
-            </select>
-        </div>
-        <button type="button">Submit</button>
+        <div class="message disabled"></div>
     </div>
+
+    <script src="/scripts/popup.js"></script>
 </body>
 </html>
