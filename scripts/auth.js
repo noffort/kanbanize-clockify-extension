@@ -2,7 +2,7 @@ const baseUrl = 'https://api.clockify.me/api/v1';
 
 function addErrorInfo() {
   apiKeyElement = document.getElementById("apiKey");
-  apiKeyElement.classList.add('error-message')
+  apiKeyElement.classList.add('error-message');
 
   setTimeout(function() {
     apiKeyElement.classList.remove('error-message');
@@ -25,7 +25,7 @@ async function auth() {
       }
   
       value = btoa(apiKey);
-      chrome.storage.sync.set({ ['noffort_Caeth3Haileeko1r']: value }, function () {
+      chrome.storage.local.set({ 'noffort_Caeth3Haileeko1r': value }, function () {
         if (chrome.runtime.lastError) {
           console.error('Error saving to Chrome storage: ', chrome.runtime.lastError);
         } else {
