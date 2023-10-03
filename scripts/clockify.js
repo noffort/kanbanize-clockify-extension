@@ -117,12 +117,10 @@ var clockify_api = {
 
   start_timer: async function(task_id, project_id) {
     try {
-      const card_title = document.querySelector(".modal-card-details .modal-content .modal-header .card-title-container .card-title").innerText;
-      console.log(card_title);
       const timeEntryData = {
         taskId: task_id,
         projectId: project_id,
-        description: card_title
+        description: kb_noffort.get_task_title()
       }
 
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/time-entries`, {
