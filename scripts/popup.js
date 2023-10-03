@@ -25,7 +25,6 @@ function fillInputs(projects = false, tags = false) {
             project_options += '<option value="' + projects[i].id + '">' + projects[i].name + '</option>';
         }
     
-        console.log(project_options);
         document.getElementById('project').innerHTML = project_options;
     }
 
@@ -35,9 +34,27 @@ function fillInputs(projects = false, tags = false) {
             tags_options += '<option value="' + tags[i].id + '">' + tags[i].name + '</option>';
         }
     
-        console.log(tags_options);
         document.getElementById('tag').innerHTML = tags_options;
     }
+}
+
+function actionButton() {
+    var project_value = document.getElementById('project').value;
+    var task_id = document.getElementById('task').value;
+
+    if (!project_value) {
+        return false;
+    }
+
+    clockify_api.get_task(task_id, project_value).then((task) => {
+        console.log(task);
+        clockify_api.start_timer(task[0].id, project_value);
+    })
+}
+
+function showAuth() {
+    let url = chrome.runtime.getURL("view/auth.html");
+    chrome.tabs.create({ url });
 }
 
 chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tabs => {
@@ -49,3 +66,20 @@ chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tab
     }
 });
 
+// chrome.storage.local.get(clockify_api.clockify_key).then((result) => {
+//     if (chrome.runtime.lastError) {
+//       console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
+//     } else {
+//         if (!result[clockify_api.clockify_key]) {
+//             showAuth();
+//         }
+//     }
+// });
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('form-container').addEventListener("submit", function(evt) {
+        evt.preventDefault();
+    }, true);
+
+    document.getElementById('action-button').addEventListener("click", actionButton);
+}, false);

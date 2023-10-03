@@ -1,3 +1,3 @@
-kb_noffort = {
+document.addEventListener('DOMContentLoaded', function() {
     
-}
+}, false);

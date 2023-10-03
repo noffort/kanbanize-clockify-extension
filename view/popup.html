@@ -13,10 +13,10 @@
                 <img src="/images/noffort_128.png" alt="Noffort Logo">
             </h1>
         </div>
-        <div id="form-container" class="disabled">
+        <form id="form-container" action="#" class="disabled">
             <input type="text" disabled placeholder="TASK" id="task">
             <div class="select-container">
-                <select id="project">
+                <select id="project" required>
                     <option value="" disabled selected>Select a Project</option>
                 </select>
             </div>
@@ -25,12 +25,12 @@
                     <option value="" disabled selected>Select a Tag</option>
                 </select>
             </div>
-            <button type="button">Submit</button>
-        </div>
+            <button type="submit" id="action-button">Submit</button>
+        </form>
         <div class="message disabled"></div>
     </div>
 
-    <script src="/scripts/clockify.js"></script>
-    <script src="/scripts/popup.js"></script>
+    <script src="/scripts/clockify.js" type="text/javascript"></script>
+    <script src="/scripts/popup.js" type="text/javascript"></script>
 </body>
 </html>
