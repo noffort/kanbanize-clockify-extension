@@ -5,6 +5,7 @@ var clockify_api = {
   user: false,
   projects: false,
   tags: false,
+  workspaces: false,
 
   
   init: async function() {
@@ -22,6 +23,7 @@ var clockify_api = {
             .then(() => {
               this.get_projects();
               this.get_tags();
+              this.get_workspaces();
             });
         }
       });
@@ -39,6 +41,7 @@ var clockify_api = {
   
       const userData = await response.json();
       this.user = userData;
+      console.log(userData);
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -88,13 +91,29 @@ var clockify_api = {
     }
   },
 
+  get_workspaces: async function() {
+    try {
+      headers = this.headers;
+      const response = await fetch(`${this.base_url}/workspaces`, { headers });
+  
+      if (!response.ok) {
+        throw new Error(`Authentication failed with status ${response.status}`);
+      }
+  
+      this.workspaces = await response.json();;
+    } catch (error) {
+      console.error('Authentication error:', error);
+      throw error;
+    }
+  },
+
   get_task: async function(task_id, project_id) {
     try {
       headers = this.headers;
-      const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks?strict-name-search=true&name=${task_id}`, { headers });
-      const task = await response.json();
+      let response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks?strict-name-search=true&name=${task_id}`, { headers });
+      let task = await response.json();
 
-      if (response.status != 404 || task.length > 0) {
+      if (response.status != 404 && task.length > 0) {
         return task;
       }
 
@@ -112,6 +131,23 @@ var clockify_api = {
 
       task = [];
       task = await response.json();
+      return task;
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      throw error;
+    }
+  },
+
+  get_task_by_id: async function(task_id, project_id) {
+    try {
+      headers = this.headers;
+      let response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks/${task_id}`, { headers });
+      let task = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Authentication failed with status ${response.status}`);
+      }
+
       return task;
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -148,5 +184,19 @@ var clockify_api = {
       console.error('Error starting timer:', error);
       throw error;
     }
+  },
+
+  check_running_entry: async function() {
+    const current_entry = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/user/${this.user.id}/time-entries?in-progress=true`, { headers });
+    if (!current_entry.ok) {
+      throw new Error(`Error to check_running_entry ${current_entry.status}`);
+    }
+
+    const entryData = await current_entry.json();
+    if (entryData.length > 0 ) {
+      return entryData;
+    }
+
+    return false;
   }
 }

@@ -1,15 +1,15 @@
 clockify_api.init();
 
+let task_id = false;
+
 function getTaskFromTabs(tabs) {
     let url = tabs[0].url;
 
-    var start = url.indexOf('cards') + 6;
-    var end = url.indexOf('/details');
+    const start = url.indexOf('cards') + 6;
+    const end = url.indexOf('/details');
 
-    var task_id = url.substring(start, end)
-
-    document.getElementById('task').value = task_id;
-    document.getElementById('form-container').classList.remove('disabled');
+    task_id = url.substring(start, end);
+    setTimeout(initPopUp, 1000);
 }
 
 function addInfo(msg) {
@@ -53,6 +53,46 @@ function actionButton() {
     })
 }
 
+function initPopUp() {
+    const workspaces = clockify_api.workspaces;
+    
+    let workspace_name = '';
+    workspaces.forEach(w => {
+        if (w.id == clockify_api.user.defaultWorkspace) {
+            workspace_name = w.name;
+        }
+    });
+
+
+    clockify_api.check_running_entry().then((result) => {
+        if (!result) {
+            document.getElementById('task').value = task_id;
+            document.getElementById('form-container').classList.remove('disabled');
+            document.querySelector('.loader').classList.add('disabled');
+            return true;
+        }
+
+        document.getElementById('running-info').classList.remove('disabled');
+        document.querySelector('.loader').classList.add('disabled');
+
+        if (workspace_name != '') {
+            document.querySelector('#workspace-info span').textContent = workspace_name;
+            document.getElementById('workspace-info').classList.remove('disabled');
+        }
+        
+        const time_entry = result[0];
+        console.log(time_entry);
+        document.getElementById('task-description').innerText = time_entry.description;
+        
+        const running_project = clockify_api.projects.filter((project) => project.id == time_entry.projectId)
+
+        console.log(time_entry.taskId);
+        clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
+            document.getElementById('task-project').innerText = running_project[0].name + ':' + task.name;
+        });
+    });
+}
+
 function showAuth() {
     let url = chrome.runtime.getURL("view/auth.html");
     chrome.tabs.create({ url });
@@ -60,7 +100,6 @@ function showAuth() {
 
 chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tabs => {
     if (tabs.length > 0) {
-        fillInputs(); 
         getTaskFromTabs(tabs);
     } else {
         addInfo("Please keep the Kanbanize tab Actived with the task opened.")
@@ -81,6 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('form-container').addEventListener("submit", function(evt) {
         evt.preventDefault();
     }, true);
+
+
 
     document.getElementById('action-button').addEventListener("click", actionButton);
 }, false);
