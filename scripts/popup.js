@@ -39,8 +39,9 @@ function fillInputs(projects = false, tags = false) {
 }
 
 function actionButton() {
-    var project_value = document.getElementById('project').value;
-    var task_id = document.getElementById('task').value;
+    const project_value = document.getElementById('project').value;
+    const tag_value = document.getElementById('tag').value;
+    const task_id = document.getElementById('task').value;
 
     if (!project_value) {
         return false;
@@ -48,7 +49,7 @@ function actionButton() {
 
     clockify_api.get_task(task_id, project_value).then((task) => {
         console.log(task);
-        clockify_api.start_timer(task[0].id, project_value);
+        clockify_api.start_timer(task[0].id, project_value, tag_value);
     })
 }
 

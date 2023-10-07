@@ -92,22 +92,26 @@ var clockify_api = {
     try {
       headers = this.headers;
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks?strict-name-search=true&name=${task_id}`, { headers });
-      console.log(response);
-      if (response.status == 404) {
-        console.log('404');
-
-        const taskData = {
-          name: task_id
-        }
-  
-        const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(taskData),
-        });
-      }
-  
       const task = await response.json();
+
+      if (response.status != 404 || task.length > 0) {
+        return task;
+      }
+
+      console.log('404');
+      const taskData = {
+        name: task_id
+      }
+
+      response = [];
+      response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects/${project_id}/tasks`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(taskData),
+      });
+
+      task = [];
+      task = await response.json();
       return task;
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -115,12 +119,16 @@ var clockify_api = {
     }
   },
 
-  start_timer: async function(task_id, project_id) {
+  start_timer: async function(task_id, project_id, tag_id) {
     try {
+      const card_title = await chrome.storage.local.get("noffort_card_title");
+      console.log(card_title.noffort_card_title);
+
       const timeEntryData = {
         taskId: task_id,
         projectId: project_id,
-        description: kb_noffort.get_task_title()
+        description: card_title.noffort_card_title,
+        tagIds: [ tag_id ]
       }
 
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/time-entries`, {
@@ -128,13 +136,14 @@ var clockify_api = {
         headers,
         body: JSON.stringify(timeEntryData),
       });
-  
+
       if (!response.ok) {
         throw new Error(`Timer start failed with status ${response.status}`);
       }
-  
+
       const timerData = await response.json();
       return timerData;
+  
     } catch (error) {
       console.error('Error starting timer:', error);
       throw error;
