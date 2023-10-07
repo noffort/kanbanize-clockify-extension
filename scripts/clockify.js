@@ -186,6 +186,26 @@ var clockify_api = {
     }
   },
 
+  stop_timer: async function() {
+    try {
+      let bodyData = {};
+      bodyData.end = new Date().toISOString();
+      
+      const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/user/${this.user.id}/time-entries`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(bodyData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error to stopping current time entry ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error stopping timer:', error);
+      throw error;
+    }
+  },
+
   check_running_entry: async function() {
     const current_entry = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/user/${this.user.id}/time-entries?in-progress=true`, { headers });
     if (!current_entry.ok) {

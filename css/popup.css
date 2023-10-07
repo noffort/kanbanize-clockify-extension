@@ -134,3 +134,8 @@ h1 img {
     overflow: hidden;
     color: #b5a1a1;
 }
+
+#counter {
+    font-size: 14px;
+    margin-top: 20px;
+}

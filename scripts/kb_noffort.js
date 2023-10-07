@@ -22,8 +22,6 @@ var kb_noffort = {
     }    
 }
 
-
-
 window.addEventListener('load', function() {
     kb_noffort.get_task_details();
 

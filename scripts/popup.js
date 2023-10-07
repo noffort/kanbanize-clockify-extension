@@ -1,6 +1,7 @@
 clockify_api.init();
 
 let task_id = false;
+let time_counter_start = '';
 
 function getTaskFromTabs(tabs) {
     let url = tabs[0].url;
@@ -48,9 +49,22 @@ function actionButton() {
     }
 
     clockify_api.get_task(task_id, project_value).then((task) => {
-        console.log(task);
-        clockify_api.start_timer(task[0].id, project_value, tag_value);
+        document.getElementById('form-container').classList.add('disabled');
+        document.querySelector('.loader').classList.remove('disabled');
+
+        clockify_api.start_timer(task[0].id, project_value, tag_value).then(() => {
+            initPopUp();
+        });
     })
+}
+
+function stopButton() {
+    document.getElementById('running-info').classList.add('disabled');
+    document.querySelector('.loader').classList.remove('disabled');
+
+    clockify_api.stop_timer().then(() => {
+        initPopUp();
+    });
 }
 
 function initPopUp() {
@@ -72,6 +86,10 @@ function initPopUp() {
             return true;
         }
 
+        const time_entry = result[0];
+        time_counter_start = time_entry.timeInterval.start;
+        setInterval(timeCounter, 1000);
+
         document.getElementById('running-info').classList.remove('disabled');
         document.querySelector('.loader').classList.add('disabled');
 
@@ -80,7 +98,6 @@ function initPopUp() {
             document.getElementById('workspace-info').classList.remove('disabled');
         }
         
-        const time_entry = result[0];
         console.log(time_entry);
         document.getElementById('task-description').innerText = time_entry.description;
         
@@ -92,6 +109,20 @@ function initPopUp() {
         });
     });
 }
+
+function timeCounter() {
+    startTime = new Date(time_counter_start).getTime();
+    const now = new Date().getTime();
+    const diff = now - startTime;
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    document.getElementById('counter').innerHTML = `${days}d ${hours % 24}h ${minutes % 60}m ${seconds % 60}s`;
+}
+
 
 function showAuth() {
     let url = chrome.runtime.getURL("view/auth.html");
@@ -121,7 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
         evt.preventDefault();
     }, true);
 
-
-
     document.getElementById('action-button').addEventListener("click", actionButton);
+    document.getElementById('stop-button').addEventListener("click", stopButton);
 }, false);
