@@ -23,7 +23,6 @@ var clockify_api = {
             .then(() => {
               this.get_projects();
               this.get_tags();
-              this.get_workspaces();
             });
         }
       });
@@ -50,6 +49,13 @@ var clockify_api = {
 
   get_projects: async function() {
     try {
+      const noffort_projects = await this.get_local_storage('noffort_projects');
+      if (noffort_projects) {
+        this.projects = noffort_projects;
+        console.info('Getting projects from cache.');
+        return this.projects;
+      }
+
       headers = this.headers;
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects?archived=false`, { headers });
   
@@ -66,6 +72,7 @@ var clockify_api = {
         })
       }
 
+      this.set_local_storage('noffort_projects', this.projects);
       fillInputs(this.projects, false);
     } catch (error) {
       console.error('Authentication error:', error);
@@ -75,6 +82,13 @@ var clockify_api = {
 
   get_tags: async function() {
     try {
+      const noffort_tags = await this.get_local_storage('noffort_tags');
+      if (noffort_tags) {
+        this.tags = noffort_tags;
+        console.info('Getting tags from cache.');
+        return this.tags;
+      }
+
       headers = this.headers;
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/tags?archived=false`, { headers });
   
@@ -84,6 +98,7 @@ var clockify_api = {
   
       const tagsData = await response.json();
       this.tags = tagsData;
+      this.set_local_storage('noffort_tags', this.tags);
       fillInputs(false, this.tags);
     } catch (error) {
       console.error('Authentication error:', error);
@@ -93,6 +108,13 @@ var clockify_api = {
 
   get_workspaces: async function() {
     try {
+      const noffort_workspaces = await this.get_local_storage('noffort_workspaces');
+      if (noffort_workspaces) {
+        this.workspaces = noffort_workspaces;
+        console.info('Getting workspaces from cache.');
+        return this.workspaces;
+      }
+
       headers = this.headers;
       const response = await fetch(`${this.base_url}/workspaces`, { headers });
   
@@ -100,7 +122,11 @@ var clockify_api = {
         throw new Error(`Authentication failed with status ${response.status}`);
       }
   
-      this.workspaces = await response.json();;
+      this.workspaces = await response.json();
+
+      this.set_local_storage('noffort_workspaces', this.workspaces);
+
+      return this.workspaces;
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -218,5 +244,46 @@ var clockify_api = {
     }
 
     return false;
+  },
+
+  get_local_storage: async function(key) {
+    try {
+      const value = await chrome.storage.local.get(key);
+
+      if (!value[key]) {
+        return false;
+      }
+    
+      const created_at = value[key]['created_at'];
+      const now = new Date().getTime();
+      const diff = (now - created_at) / (1000 * 60 * 60);
+  
+      if (diff > 8) {
+        this.set_local_storage(key, false);
+        return false;
+      }
+  
+      return value[key]['value'];
+    } catch (error) {
+      console.error('Error getting local storage:', error);
+      throw error;
+    }
+  },
+
+  set_local_storage: async function(key, value) {
+    try {
+      const now = new Date().getTime();
+      const valueObj = {
+        created_at: now,
+        value: value
+      }
+
+      await chrome.storage.local.set({ [key]: valueObj });
+
+      return true;
+    } catch (error) {
+      console.error('Error saving local storage:', error);
+      throw error;
+    }
   }
 }
