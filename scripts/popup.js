@@ -49,7 +49,7 @@ function actionButton() {
     let billable = document.getElementById('billable').getAttribute('billable');
     billable = billable == "on" ? true : false;
 
-    if (!project_value) {
+    if (!project_value || !tag_value) {
         return false;
     }
 
