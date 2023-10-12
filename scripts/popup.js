@@ -55,7 +55,7 @@ function actionButton() {
         document.getElementById('form-container').classList.add('disabled');
         document.querySelector('.loader').classList.remove('disabled');
 
-        clockify_api.start_timer(task[0].id, project_value, tag_value).then(() => {
+        clockify_api.start_timer(task.id, project_value, tag_value).then(() => {
             initPopUp();
         });
     })
@@ -78,44 +78,44 @@ function initPopUp() {
                 workspace_name = w.name;
             }
         });
+
+        if (workspace_name != '') {
+            document.querySelector('#workspace-info span').textContent = workspace_name;
+            document.getElementById('workspace-info').classList.remove('disabled');
+        }
     
     
         clockify_api.check_running_entry().then((result) => {
-            if (!result) {
-                if (task_id) {
-                    clockify_api.get_projects().then((projects) => {
+            clockify_api.get_projects().then((projects) => {
+                if (!result) {
+                    if (task_id) {
                         clockify_api.get_tags().then((tags) => {
                             fillInputs(projects, tags);
                             document.getElementById('task').value = task_id;
                             document.getElementById('form-container').classList.remove('disabled');
-                            document.querySelector('.loader').classList.add('disabled');
-                        })
-                    });
-                } else {
+                        });
+                    } else {
+                        addInfo("Please keep the Kanbanize tab Actived with the task opened.")
+                    }
+
                     document.querySelector('.loader').classList.add('disabled');
-                    addInfo("Please keep the Kanbanize tab Actived with the task opened.")
+                    return true;
                 }
-                return true;
-            }
-    
-            const time_entry = result[0];
-            time_counter_start = time_entry.timeInterval.start;
-            setInterval(timeCounter, 1000);
-    
-            document.getElementById('running-info').classList.remove('disabled');
-            document.querySelector('.loader').classList.add('disabled');
-    
-            if (workspace_name != '') {
-                document.querySelector('#workspace-info span').textContent = workspace_name;
-                document.getElementById('workspace-info').classList.remove('disabled');
-            }
-            
-            document.getElementById('task-description').innerText = time_entry.description;
-            
-            const running_project = clockify_api.projects.filter((project) => project.id == time_entry.projectId)
-    
-            clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
-                document.getElementById('task-project').innerText = running_project[0].name + ':' + task.name;
+        
+                const time_entry = result[0];
+                time_counter_start = time_entry.timeInterval.start;
+                setInterval(timeCounter, 1000);
+        
+                document.getElementById('running-info').classList.remove('disabled');
+                document.querySelector('.loader').classList.add('disabled');
+                
+                document.getElementById('task-description').innerText = time_entry.description;
+                
+                const running_project = clockify_api.projects.filter((project) => project.id == time_entry.projectId)
+        
+                clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
+                    document.getElementById('task-project').innerText = running_project[0].name + ':' + task.name;
+                });
             });
         });
     });

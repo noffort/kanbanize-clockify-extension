@@ -142,7 +142,7 @@ var clockify_api = {
       let task = await response.json();
 
       if (response.status != 404 && task.length > 0) {
-        return task;
+        return task[0];
       }
 
       console.log('404');
