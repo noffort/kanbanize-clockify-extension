@@ -139,3 +139,15 @@ h1 img {
     font-size: 14px;
     margin-top: 20px;
 }
+
+#billable {
+    float: left;
+    font-size: 24px;
+    margin-left: 12px;
+    cursor: pointer;
+    color: #b5a1a1;
+}
+
+#billable.billable-on {
+    color: #970645d1;
+}

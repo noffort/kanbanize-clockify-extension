@@ -183,7 +183,7 @@ var clockify_api = {
     }
   },
 
-  start_timer: async function(task_id, project_id, tag_id) {
+  start_timer: async function(task_id, project_id, tag_id, billable) {
     try {
       const card_title = await chrome.storage.local.get("noffort_card_title");
       console.log(card_title.noffort_card_title);
@@ -192,6 +192,7 @@ var clockify_api = {
         taskId: task_id,
         projectId: project_id,
         description: card_title.noffort_card_title,
+        billable : billable,
         tagIds: [ tag_id ]
       }
 

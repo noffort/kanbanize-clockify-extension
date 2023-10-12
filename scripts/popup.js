@@ -46,6 +46,8 @@ function actionButton() {
     const project_value = document.getElementById('project').value;
     const tag_value = document.getElementById('tag').value;
     const task_id = document.getElementById('task').value;
+    let billable = document.getElementById('billable').getAttribute('billable');
+    billable = billable == "on" ? true : false;
 
     if (!project_value) {
         return false;
@@ -55,7 +57,7 @@ function actionButton() {
         document.getElementById('form-container').classList.add('disabled');
         document.querySelector('.loader').classList.remove('disabled');
 
-        clockify_api.start_timer(task.id, project_value, tag_value).then(() => {
+        clockify_api.start_timer(task.id, project_value, tag_value, billable).then(() => {
             initPopUp();
         });
     })
@@ -140,6 +142,20 @@ function showAuth() {
     chrome.tabs.create({ url });
 }
 
+function billableAction() {
+    const billableElement = document.getElementById('billable');
+
+    if (billableElement.classList.contains('billable-on')) {
+        billableElement.classList.remove('billable-on');
+        billableElement.setAttribute("title", "Non-billable")
+        billableElement.setAttribute("billable", "off")
+    } else {
+        billableElement.classList.add('billable-on');
+        billableElement.setAttribute("billable", "on")
+        billableElement.setAttribute("title", "Billable")
+    }
+}
+
 chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tabs => {
     getTaskFromTabs(tabs);
 });
@@ -161,4 +177,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('action-button').addEventListener("click", actionButton);
     document.getElementById('stop-button').addEventListener("click", stopButton);
+    document.getElementById('billable').addEventListener("click", billableAction);
 }, false);
