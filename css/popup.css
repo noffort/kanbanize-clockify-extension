@@ -47,6 +47,19 @@ button:hover {
     background-color: #970645;
 }
 
+#resume-button,
+#pause-button {
+    margin-top: 10px;
+    background-color: #ddb7b7;
+    font-size: 12px;
+    padding: 5px 15px;
+}
+
+#resume-button:hover,
+#pause-button:hover {
+    background-color: #c99d9d;
+}
+
 h1 {
     float: left;
 }
@@ -137,7 +150,8 @@ h1 img {
 
 #counter {
     font-size: 14px;
-    margin-top: 20px;
+    margin-top: -20px;
+    text-align: left;
 }
 
 #billable {

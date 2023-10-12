@@ -186,6 +186,7 @@ var clockify_api = {
   start_timer: async function(task_id, project_id, tag_id, billable) {
     try {
       const card_title = await chrome.storage.local.get("noffort_card_title");
+      tag_id = Array.isArray(tag_id) ? tag_id : [ tag_id ];
       console.log(card_title.noffort_card_title);
 
       const timeEntryData = {
@@ -193,7 +194,7 @@ var clockify_api = {
         projectId: project_id,
         description: card_title.noffort_card_title,
         billable : billable,
-        tagIds: [ tag_id ]
+        tagIds: tag_id
       }
 
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/time-entries`, {
@@ -225,10 +226,14 @@ var clockify_api = {
         headers,
         body: JSON.stringify(bodyData),
       });
-  
+
       if (!response.ok) {
         throw new Error(`Error to stopping current time entry ${response.status}`);
       }
+
+      const stopped_timyentry = await response.json();
+      
+      return stopped_timyentry;
     } catch (error) {
       console.error('Error stopping timer:', error);
       throw error;
