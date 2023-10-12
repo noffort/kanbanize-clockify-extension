@@ -19,11 +19,7 @@ var clockify_api = {
             'Content-Type': 'application/json',
           };
   
-          clockify_api.auth()
-            .then(() => {
-              this.get_projects();
-              this.get_tags();
-            });
+          clockify_api.auth();
         }
       });
     }
@@ -40,7 +36,6 @@ var clockify_api = {
   
       const userData = await response.json();
       this.user = userData;
-      console.log(userData);
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -53,8 +48,11 @@ var clockify_api = {
       if (noffort_projects) {
         this.projects = noffort_projects;
         console.info('Getting projects from cache.');
+
         return this.projects;
       }
+
+      console.log('making projects rquest');
 
       headers = this.headers;
       const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects?archived=false`, { headers });
@@ -73,7 +71,8 @@ var clockify_api = {
       }
 
       this.set_local_storage('noffort_projects', this.projects);
-      fillInputs(this.projects, false);
+
+      return this.projects;
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -86,6 +85,7 @@ var clockify_api = {
       if (noffort_tags) {
         this.tags = noffort_tags;
         console.info('Getting tags from cache.');
+
         return this.tags;
       }
 
@@ -99,7 +99,8 @@ var clockify_api = {
       const tagsData = await response.json();
       this.tags = tagsData;
       this.set_local_storage('noffort_tags', this.tags);
-      fillInputs(false, this.tags);
+
+      return this.tags;
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -109,6 +110,7 @@ var clockify_api = {
   get_workspaces: async function() {
     try {
       const noffort_workspaces = await this.get_local_storage('noffort_workspaces');
+
       if (noffort_workspaces) {
         this.workspaces = noffort_workspaces;
         console.info('Getting workspaces from cache.');
@@ -262,7 +264,7 @@ var clockify_api = {
         this.set_local_storage(key, false);
         return false;
       }
-  
+      
       return value[key]['value'];
     } catch (error) {
       console.error('Error getting local storage:', error);

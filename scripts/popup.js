@@ -4,13 +4,16 @@ let task_id = false;
 let time_counter_start = '';
 
 function getTaskFromTabs(tabs) {
-    let url = tabs[0].url;
+    if (typeof tabs !== 'undefined' && tabs.length > 0) {
+        let url = tabs[0].url;
 
-    const start = url.indexOf('cards') + 6;
-    const end = url.indexOf('/details');
+        const start = url.indexOf('cards') + 6;
+        const end = url.indexOf('/details');
 
-    task_id = url.substring(start, end);
-    setTimeout(initPopUp, 300);
+        task_id = url.substring(start, end);
+    }
+
+    setTimeout(initPopUp, 600);
 }
 
 function addInfo(msg) {
@@ -79,9 +82,19 @@ function initPopUp() {
     
         clockify_api.check_running_entry().then((result) => {
             if (!result) {
-                document.getElementById('task').value = task_id;
-                document.getElementById('form-container').classList.remove('disabled');
-                document.querySelector('.loader').classList.add('disabled');
+                if (task_id) {
+                    clockify_api.get_projects().then((projects) => {
+                        clockify_api.get_tags().then((tags) => {
+                            fillInputs(projects, tags);
+                            document.getElementById('task').value = task_id;
+                            document.getElementById('form-container').classList.remove('disabled');
+                            document.querySelector('.loader').classList.add('disabled');
+                        })
+                    });
+                } else {
+                    document.querySelector('.loader').classList.add('disabled');
+                    addInfo("Please keep the Kanbanize tab Actived with the task opened.")
+                }
                 return true;
             }
     
@@ -97,12 +110,10 @@ function initPopUp() {
                 document.getElementById('workspace-info').classList.remove('disabled');
             }
             
-            console.log(time_entry);
             document.getElementById('task-description').innerText = time_entry.description;
             
             const running_project = clockify_api.projects.filter((project) => project.id == time_entry.projectId)
     
-            console.log(time_entry.taskId);
             clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
                 document.getElementById('task-project').innerText = running_project[0].name + ':' + task.name;
             });
@@ -130,12 +141,7 @@ function showAuth() {
 }
 
 chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tabs => {
-    if (tabs.length > 0) {
-        getTaskFromTabs(tabs);
-    } else {
-        document.querySelector('.loader').classList.add('disabled');
-        addInfo("Please keep the Kanbanize tab Actived with the task opened.")
-    }
+    getTaskFromTabs(tabs);
 });
 
 // chrome.storage.local.get(clockify_api.clockify_key).then((result) => {
