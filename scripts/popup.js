@@ -138,7 +138,7 @@ function timeCounter() {
 
 
 function showAuth() {
-    let url = chrome.runtime.getURL("view/auth.html");
+    let url = chrome.runtime.getURL("view/authentication.html");
     chrome.tabs.create({ url });
 }
 
@@ -160,15 +160,15 @@ chrome.tabs.query({active: true, url : 'https://*.kanbanize.com/*/cards/*'}, tab
     getTaskFromTabs(tabs);
 });
 
-// chrome.storage.local.get(clockify_api.clockify_key).then((result) => {
-//     if (chrome.runtime.lastError) {
-//       console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
-//     } else {
-//         if (!result[clockify_api.clockify_key]) {
-//             showAuth();
-//         }
-//     }
-// });
+chrome.storage.local.get(clockify_api.clockify_key).then((result) => {
+    if (chrome.runtime.lastError) {
+      console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
+    } else {
+        if (!result[clockify_api.clockify_key]) {
+            showAuth();
+        }
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('form-container').addEventListener("submit", function(evt) {

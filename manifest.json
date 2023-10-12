@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Noffort - Integrate Clockify and Kanbanize.",
+  "name": "Noffort: Integrate Clockify and Kanbanize.",
   "description": "A extension to integration Clockify and Kanbanize.",
   "version": "1.0.0",
   "icons": {
