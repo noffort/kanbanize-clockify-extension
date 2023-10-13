@@ -13,6 +13,12 @@ async function auth() {
     try {
       var apiKey = document.getElementById("apiKey").value
 
+      if (!apiKey) {
+        return false;
+      }
+
+      document.getElementById('bg').classList.remove('disabled');
+      
       const headers = {
         'X-Api-Key': apiKey,
         'Content-Type': 'application/json',
@@ -21,14 +27,23 @@ async function auth() {
       const response = await fetch(`${baseUrl}/user`, { headers });
   
       if (!response.ok) {
+        document.getElementById('bg').classList.add('disabled');
         throw new Error(`Authentication failed with status ${response.status}`);
       }
   
       value = btoa(apiKey);
       chrome.storage.local.set({ 'noffort_Caeth3Haileeko1r': value }, function () {
+        console.log('saved');
         if (chrome.runtime.lastError) {
+          document.getElementById('bg').classList.add('disabled');
           console.error('Error saving to Chrome storage: ', chrome.runtime.lastError);
         } else {
+          chrome.tabs.query({url : 'https://*.kanbanize.com/*'}, tabs => {
+            tabs.forEach((tab) => {
+              chrome.tabs.reload(tab.id);
+            })
+          });
+          
           chrome.tabs.getCurrent(function(tab) {
             chrome.tabs.remove(tab.id, function() { });
           });

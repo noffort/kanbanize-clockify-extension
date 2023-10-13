@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/auth.css">
-    <title>Noffort - Configure your Clockify API KEY</title>
+    <title>Noffort: Configure the integration</title>
 </head>
 <body>
     <div class="container">
         <img src="/images/logo.png" alt="Noffort Logo" class="logo">
-        <h1>Enter Your <a href="https://app.clockify.me/user/settings" target="_blank" title="Click and Scroll all the page">Clockify API Key</a></h1>
-        <p>Provide your API key below to access the service.</p>
+        <p>Provide your <a href="https://app.clockify.me/user/settings" target="_blank" title="Click and Scroll all the page">Clockify API KEY</a> below to access the service.</p>
         <form id="apiKeyForm" action="#">
             <div class="input-container">
-                <input type="text" id="apiKey" class="input-field" placeholder="Enter your API key" required>
+                <input type="password" id="apiKey" class="input-field" placeholder="Enter your Clockify API key" required>
             </div>
             <button type="submit" class="submit-button" id="submit-button">Submit</button>
         </form>
+    </div>
+    <div id="bg" class="background disabled">
+        <div class="loader"></div>
     </div>
 </body>
 
