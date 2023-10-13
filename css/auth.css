@@ -93,3 +93,7 @@ body {
 .disabled {
     display: none !important;
 }
+
+.terms-of-use {
+    margin-bottom: 20px;
+}

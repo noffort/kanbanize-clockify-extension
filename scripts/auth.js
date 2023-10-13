@@ -13,7 +13,7 @@ async function auth() {
     try {
       var apiKey = document.getElementById("apiKey").value
 
-      if (!apiKey) {
+      if (!apiKey || !document.getElementById('terms-of-use').checked) {
         return false;
       }
 
@@ -33,7 +33,6 @@ async function auth() {
   
       value = btoa(apiKey);
       chrome.storage.local.set({ 'noffort_Caeth3Haileeko1r': value }, function () {
-        console.log('saved');
         if (chrome.runtime.lastError) {
           document.getElementById('bg').classList.add('disabled');
           console.error('Error saving to Chrome storage: ', chrome.runtime.lastError);
@@ -44,6 +43,8 @@ async function auth() {
             })
           });
           
+          chrome.tabs.create({ url: "http://eepurl.com/iBKrv-/" });
+
           chrome.tabs.getCurrent(function(tab) {
             chrome.tabs.remove(tab.id, function() { });
           });
