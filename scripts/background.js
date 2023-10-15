@@ -1,14 +1,14 @@
-chrome.runtime.onInstalled.addListener(({ reason, version }) => {
-    if (reason === chrome.runtime.OnInstalledReason.INSTALL) {
+browser.runtime.onInstalled.addListener((details) => {
+    if (details.reason == 'install') {
         authenticate();
     }
 });
 
-chrome.action.onClicked.addListener((tab) => {
+browser.action.onClicked.addListener((tab) => {
     authenticate();
 });
 
 function authenticate(info, tab) {
-    let url = chrome.runtime.getURL("view/authentication.html");
-    chrome.tabs.create({ url });
+    let url = browser.runtime.getURL("view/authentication.html");
+    browser.tabs.create({ url });
 }
