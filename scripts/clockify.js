@@ -28,6 +28,13 @@ var clockify_api = {
   auth: async function() {
     try {
       headers = this.headers;
+      const user = await this.get_local_storage('noffort_user');
+      if (user) {
+        this.user = user;
+        console.info('Getting user from cache.');
+        return this.user;
+      }
+
       const response = await fetch(`${this.base_url}/user`, { headers });
   
       if (!response.ok) {
@@ -36,6 +43,7 @@ var clockify_api = {
   
       const userData = await response.json();
       this.user = userData;
+      this.set_local_storage('noffort_user', this.user);
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
@@ -110,7 +118,6 @@ var clockify_api = {
   get_workspaces: async function() {
     try {
       const noffort_workspaces = await this.get_local_storage('noffort_workspaces');
-
       if (noffort_workspaces) {
         this.workspaces = noffort_workspaces;
         console.info('Getting workspaces from cache.');

@@ -94,7 +94,6 @@ function stopButton() {
     document.querySelector('.loader').classList.remove('disabled');
 
     chrome.storage.local.get("noffort_pause").then((time_entry) => {
-        console.log(time_entry);
         if (time_entry.noffort_pause) {
             chrome.storage.local.set({ "noffort_pause": false }).then(() => {
                 initPopUp();
@@ -124,7 +123,6 @@ function pauseAction() {
 function resumeAction() {
     chrome.storage.local.get("noffort_pause").then((time_entry) => {
         const timeEntryObj = time_entry.noffort_pause;
-        console.log(time_entry);
 
         const project_value = timeEntryObj.projectId;
         const tag_value = timeEntryObj.tagIds;
