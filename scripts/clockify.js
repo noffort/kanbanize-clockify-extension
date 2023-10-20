@@ -56,14 +56,13 @@ var clockify_api = {
       if (noffort_projects) {
         this.projects = noffort_projects;
         console.info('Getting projects from cache.');
-
         return this.projects;
       }
 
       console.log('making projects rquest');
 
       headers = this.headers;
-      const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects?archived=false`, { headers });
+      const response = await fetch(`${this.base_url}/workspaces/${this.user.defaultWorkspace}/projects?archived=false&page-size=200`, { headers });
   
       if (!response.ok) {
         throw new Error(`Authentication failed with status ${response.status}`);
