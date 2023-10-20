@@ -8,9 +8,10 @@ function getTaskFromTabs(tabs) {
         let url = tabs[0].url;
 
         const start = url.indexOf('cards') + 6;
-        const end = url.indexOf('/details');
+        const partial_id_string = url.substring(start);
+        const end = partial_id_string.indexOf('/');
 
-        task_id = url.substring(start, end);
+        task_id = partial_id_string.substring(0, end);
     }
 
     setTimeout(initPopUp, 600);
