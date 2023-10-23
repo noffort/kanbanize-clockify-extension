@@ -12,8 +12,9 @@ function addErrorInfo() {
 async function auth() {
     try {
       var apiKey = document.getElementById("apiKey").value
+      var kbApiKey = document.getElementById("apiKeyKb").value
 
-      if (!apiKey || !document.getElementById('terms-of-use').checked) {
+      if (!apiKey || kbApiKey || !document.getElementById('terms-of-use').checked) {
         return false;
       }
 

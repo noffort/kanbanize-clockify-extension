@@ -238,6 +238,7 @@ var clockify_api = {
       }
 
       const stopped_timyentry = await response.json();
+      console.log(stopped_timyentry);
       
       return stopped_timyentry;
     } catch (error) {
