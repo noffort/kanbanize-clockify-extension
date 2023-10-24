@@ -1,20 +1,19 @@
 var kanbanize_api = {
-  clockify_key: 'noffort_oE3r7WvB9qtpLS7P',
   api_version: '/api/v2/',
   base_url: false,
   headers: false,
 
-  verify_api: async function(baseUrl, key) {
+  verify_api: async function(baseUrl) {
     try {
       this.headers = {
-        'X-Api-Key': key,
         'Content-Type': 'application/json',
       };
   
       this.base_url = baseUrl;
-  
+      
+      const headers = this.headers;
       const response = await fetch(`${this.base_url}/api/v2/me`, { headers });
-  
+
       if (!response.ok) {
         throw new Error(`Authentication failed with status ${response.status}`);
       }
@@ -22,7 +21,7 @@ var kanbanize_api = {
       return true;
     } catch (error) {
       console.error('Error to check API connection:', error);
-      throw error;
+      return false;
     }
   },
 
@@ -31,19 +30,10 @@ var kanbanize_api = {
         const value = await chrome.storage.local.get(key);
 
         if (!value[key]) {
-        return false;
+          return false;
         }
-    
-        const created_at = value[key]['created_at'];
-        const now = new Date().getTime();
-        const diff = (now - created_at) / (1000 * 60 * 60);
-    
-        if (diff > 8) {
-        this.set_local_storage(key, false);
-        return false;
-        }
-        
-        return value[key]['value'];
+  
+        return value[key];
     } catch (error) {
         console.error('Error getting local storage:', error);
         throw error;
@@ -52,13 +42,7 @@ var kanbanize_api = {
 
   set_local_storage: async function(key, value) {
     try {
-        const now = new Date().getTime();
-        const valueObj = {
-        created_at: now,
-        value: value
-        }
-
-        await chrome.storage.local.set({ [key]: valueObj });
+        await chrome.storage.local.set({ [key]: value });
 
         return true;
     } catch (error) {
