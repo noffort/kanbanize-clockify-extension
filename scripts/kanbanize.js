@@ -11,7 +11,6 @@ var kanbanize_api = {
         'apikey': apiKey
       };
       
-      console.log(this.headers);
       const headers = this.headers;
       const response = await fetch(`${baseUrl}${this.api_version}/me`, { headers });
 
@@ -25,6 +24,32 @@ var kanbanize_api = {
       return true;
     } catch (error) {
       console.error('Error to check API connection:', error);
+      return false;
+    }
+  },
+
+  get_card_title: async function(card_id) {
+    try {
+      api_key = await this.get_api_key();
+      this.headers = {
+        'Content-Type': 'application/json',
+        'apikey': api_key
+      };
+      
+      const base_url = await this.get_base_url();
+      const headers = this.headers;
+      const response = await fetch(`${base_url}${this.api_version}/cards/${card_id}`, { headers });
+
+      if (!response.ok) {
+        throw new Error(`Authentication failed with status ${response.status}`);
+      }
+
+      cardData = await response.json();
+      const title = cardData.data.title;
+
+      return title;
+    } catch (error) {
+      console.error('Error to get card:', error);
       return false;
     }
   },
@@ -56,8 +81,6 @@ var kanbanize_api = {
         comment: "Added by noffort extension"
       }
 
-      console.log(timeEntryData);
-
       response = [];
       response = await fetch(`${base_url}${this.api_version}/loggedTime`, {
         method: 'POST',
@@ -70,7 +93,6 @@ var kanbanize_api = {
       }
 
       responseData = await response.json();
-      console.log(responseData);
       return responseData;
     } catch (error) {
       console.error('Error to check API connection:', error);

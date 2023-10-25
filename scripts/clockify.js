@@ -189,16 +189,15 @@ var clockify_api = {
     }
   },
 
-  start_timer: async function(task_id, project_id, tag_id, billable) {
+  start_timer: async function(task_id, project_id, tag_id, billable, card_id) {
     try {
-      const card_title = await chrome.storage.local.get("noffort_card_title");
+      const card_title = await kanbanize_api.get_card_title(card_id);
       tag_id = Array.isArray(tag_id) ? tag_id : [ tag_id ];
-      console.log(card_title.noffort_card_title);
 
       const timeEntryData = {
         taskId: task_id,
         projectId: project_id,
-        description: card_title.noffort_card_title,
+        description: card_title,
         billable : billable,
         tagIds: tag_id
       }
@@ -238,7 +237,6 @@ var clockify_api = {
       }
 
       const stopped_timyentry = await response.json();
-      console.log(stopped_timyentry);
       
       return stopped_timyentry;
     } catch (error) {
