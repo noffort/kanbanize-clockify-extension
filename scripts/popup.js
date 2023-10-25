@@ -102,9 +102,12 @@ function stopButton() {
             });
         } else {
             clockify_api.stop_timer().then((time_entry) => {
-                kanbanize_api.save_time(task_id, time_entry).then(() => {
-                    initPopUp();
-                })                
+                clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
+                    kanbanize_api.save_time(task.name, time_entry).then(() => {
+                        initPopUp();
+                    });
+                });
+                             
             });
         }
     });

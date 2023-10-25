@@ -1,20 +1,26 @@
 var kanbanize_api = {
   api_version: '/api/v2',
+  api_key: false,
   base_url: false,
   headers: false,
 
-  verify_api: async function(baseUrl) {
+  verify_api: async function(baseUrl, apiKey) {
     try {
       this.headers = {
         'Content-Type': 'application/json',
+        'apikey': apiKey
       };
       
+      console.log(this.headers);
       const headers = this.headers;
-      const response = await fetch(`${this.base_url}${this.api_version}/me`, { headers });
+      const response = await fetch(`${baseUrl}${this.api_version}/me`, { headers });
 
       if (!response.ok) {
         throw new Error(`Authentication failed with status ${response.status}`);
       }
+
+      kanbanize_api.set_local_storage("kb_base_url", baseUrl); 
+      kanbanize_api.set_local_storage("kb_api_key", btoa(apiKey)); 
 
       return true;
     } catch (error) {
@@ -25,10 +31,12 @@ var kanbanize_api = {
 
   save_time: async function(taskId, timeEntry) {
     try {
+      api_key = await this.get_api_key();
+
       this.headers = {
         'Content-Type': 'application/json',
         'accept': 'application/json',
-        'apikey': 'APIKEY'
+        'apikey': api_key
       };
 
       base_url = await this.get_base_url();
@@ -45,7 +53,7 @@ var kanbanize_api = {
         card_id: taskId,
         date: today,
         time: time,
-        comment: "Add by extension"
+        comment: "Added by noffort extension"
       }
 
       console.log(timeEntryData);
@@ -88,6 +96,17 @@ var kanbanize_api = {
     this.base_url = await this.get_local_storage("kb_base_url");
 
     return this.base_url;
+  },
+
+  get_api_key: async function() {
+    if (this.api_key) {
+      return this.api_key;
+    }
+
+    const api_key = await this.get_local_storage("kb_api_key");
+    this.api_key = atob(api_key);
+
+    return this.api_key;
   },
 
   get_local_storage: async function(key) {
