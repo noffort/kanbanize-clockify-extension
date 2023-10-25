@@ -4,16 +4,28 @@ function addErrorInfo() {
   apiKeyElement = document.getElementById("apiKey");
   apiKeyElement.classList.add('error-message');
 
+  apiKeyKbElement = document.getElementById("apiKeyKb");
+  apiKeyKbElement.classList.add('error-message');
+
+  baseUrlElement = document.getElementById("baseUrlKb");
+  baseUrlElement.classList.add('error-message');
+  document.getElementById('bg').classList.add('disabled')
+
   setTimeout(function() {
     apiKeyElement.classList.remove('error-message');
+    baseUrlElement.classList.remove('error-message');
+    apiKeyKbElement.classList.remove('error-message');
   }, 5000)
 }
 
 async function auth() {
     try {
-      var apiKey = document.getElementById("apiKey").value
+      const apiKey = document.getElementById("apiKey").value;
+      const apiKeyKb = document.getElementById("apiKeyKb").value;
+      const kbBaseUrl = document.getElementById("baseUrlKb").value;
+      const termsOfUse = document.getElementById('terms-of-use').checked;
 
-      if (!apiKey || !document.getElementById('terms-of-use').checked) {
+      if (!apiKey || !kbBaseUrl || !termsOfUse || !apiKeyKb) {
         return false;
       }
 
@@ -30,7 +42,13 @@ async function auth() {
         document.getElementById('bg').classList.add('disabled');
         throw new Error(`Authentication failed with status ${response.status}`);
       }
-  
+
+      const checkKb = await kanbanize_api.verify_api(kbBaseUrl, apiKeyKb);
+      if (!checkKb) {
+        console.error('Kanbanize Credentials are invalid.')
+        throw new Error(`Failed to connect in Kanbanize API. Please review the Base Url and API Key.`);
+      }
+
       value = btoa(apiKey);
       chrome.storage.local.set({ 'noffort_Caeth3Haileeko1r': value }, function () {
         if (chrome.runtime.lastError) {
@@ -51,6 +69,7 @@ async function auth() {
         }
       });
     } catch (error) {
+      alert('Authentication error:' + error);
       console.error('Authentication error:', error);
       addErrorInfo()
       throw error;

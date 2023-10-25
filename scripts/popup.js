@@ -84,7 +84,7 @@ function actionButton() {
         document.getElementById('form-container').classList.add('disabled');
         document.querySelector('.loader').classList.remove('disabled');
 
-        clockify_api.start_timer(task.id, project_value, tag_value, billable).then(() => {
+        clockify_api.start_timer(task.id, project_value, tag_value, billable, task_id).then(() => {
             initPopUp();
         });
     })
@@ -101,8 +101,13 @@ function stopButton() {
                 return true;
             });
         } else {
-            clockify_api.stop_timer().then(() => {
-                initPopUp();
+            clockify_api.stop_timer().then((time_entry) => {
+                clockify_api.get_task_by_id(time_entry.taskId, time_entry.projectId).then((task) => {
+                    kanbanize_api.save_time(task.name, time_entry).then(() => {
+                        initPopUp();
+                    });
+                });
+                             
             });
         }
     });
@@ -116,6 +121,9 @@ function pauseAction() {
     clockify_api.stop_timer().then((time_entry) => {
         time_entry.task_name = document.getElementById('task-project').getAttribute('task-name');
         chrome.storage.local.set({ "noffort_pause": time_entry }).then(() => {
+            kanbanize_api.save_time(time_entry.task_name, time_entry).then(() => {
+                initPopUp();
+            });
             initPopUp();
         });
     });
@@ -134,7 +142,7 @@ function resumeAction() {
             document.getElementById('running-info').classList.add('disabled');
             document.querySelector('.loader').classList.remove('disabled');
     
-            clockify_api.start_timer(task.id, project_value, tag_value, billable).then(() => {
+            clockify_api.start_timer(task.id, project_value, tag_value, billable, task_name).then(() => {
                 chrome.storage.local.set({ "noffort_pause": false }).then(() => {
                     initPopUp();
                 })
@@ -230,6 +238,26 @@ chrome.storage.local.get(clockify_api.clockify_key).then((result) => {
       console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
     } else {
         if (!result[clockify_api.clockify_key]) {
+            showAuth();
+        }
+    }
+});
+
+chrome.storage.local.get('kb_base_url').then((result) => {
+    if (chrome.runtime.lastError) {
+      console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
+    } else {
+        if (!result['kb_base_url']) {
+            showAuth();
+        }
+    }
+});
+
+chrome.storage.local.get('kb_api_key').then((result) => {
+    if (chrome.runtime.lastError) {
+      console.error('Error getting from Chrome storage: ', chrome.runtime.lastError);
+    } else {
+        if (!result['kb_api_key']) {
             showAuth();
         }
     }
